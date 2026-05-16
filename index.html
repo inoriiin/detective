@@ -237,6 +237,26 @@
       color: #d1d5db;
     }
 
+    .role-display {
+      margin-top: 10px;
+      padding: 10px;
+      border: 3px solid #f8fafc;
+      font-size: 22px;
+      font-weight: bold;
+      text-transform: uppercase;
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    .role-civilian {
+      background: #2563eb;
+      color: #dbeafe;
+    }
+
+    .role-impostor {
+      background: #dc2626;
+      color: #fee2e2;
+    }
+
     .clue {
       margin-top: 12px;
       padding-top: 12px;
@@ -364,6 +384,7 @@
       <div class="word-card">
         <span class="badge" id="currentPlayerBadge">Player</span>
         <div id="wordDisplay" class="hidden-word">Tap reveal to see your word</div>
+        <div id="roleDisplay" class="role-display" style="display:none;"></div>
         <div id="clueDisplay" class="clue" style="display:none;"></div>
       </div>
 
@@ -529,6 +550,9 @@
       document.getElementById('currentPlayerBadge').textContent = current.name;
       document.getElementById('wordDisplay').textContent = 'Tap reveal to see your word';
       document.getElementById('wordDisplay').className = 'hidden-word';
+      document.getElementById('roleDisplay').style.display = 'none';
+      document.getElementById('roleDisplay').textContent = '';
+      document.getElementById('roleDisplay').className = 'role-display';
       document.getElementById('clueDisplay').style.display = 'none';
       document.getElementById('clueDisplay').textContent = '';
       document.getElementById('revealButton').style.display = 'block';
@@ -542,6 +566,15 @@
 
       wordDisplay.textContent = current.word;
       wordDisplay.className = 'word';
+
+      const roleDisplay = document.getElementById('roleDisplay');
+      roleDisplay.textContent = current.role === 'Impostor'
+        ? 'You are the Impostor'
+        : 'You are a Civilian';
+      roleDisplay.className = current.role === 'Impostor'
+        ? 'role-display role-impostor'
+        : 'role-display role-civilian';
+      roleDisplay.style.display = 'block';
 
       if (current.role === 'Impostor' && players.length <= 5) {
         clueDisplay.textContent = `Clue about the real word: ${impostorClue}`;
