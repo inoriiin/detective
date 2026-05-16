@@ -424,6 +424,8 @@
   </main>
 
   <script>
+    let lastPairIndex = -1;
+
     const wordPairs = [
       { civilian: 'Pizza', impostor: 'Burger', clue: 'Food' },
       { civilian: 'Beach', impostor: 'Pool', clue: 'Water' },
@@ -449,7 +451,111 @@
       { civilian: 'Ocean', impostor: 'River', clue: 'Water' },
       { civilian: 'King', impostor: 'Queen', clue: 'Royalty' },
       { civilian: 'Pen', impostor: 'Pencil', clue: 'Writing' },
-      { civilian: 'Ice Cream', impostor: 'Cake', clue: 'Dessert' }
+      { civilian: 'Ice Cream', impostor: 'Cake', clue: 'Dessert' },
+      { civilian: 'Lion', impostor: 'Tiger', clue: 'Wild Animal' },
+      { civilian: 'Apple', impostor: 'Orange', clue: 'Fruit' },
+      { civilian: 'Notebook', impostor: 'Book', clue: 'Reading' },
+      { civilian: 'Keyboard', impostor: 'Mouse', clue: 'Computer' },
+      { civilian: 'Helmet', impostor: 'Cap', clue: 'Headwear' },
+      { civilian: 'Sandwich', impostor: 'Hotdog', clue: 'Snack' },
+      { civilian: 'Candle', impostor: 'Flashlight', clue: 'Light' },
+      { civilian: 'Clock', impostor: 'Watch', clue: 'Time' },
+      { civilian: 'Basket', impostor: 'Bucket', clue: 'Container' },
+      { civilian: 'Elephant', impostor: 'Rhino', clue: 'Big Animal' },
+      { civilian: 'Banana', impostor: 'Mango', clue: 'Tropical Fruit' },
+      { civilian: 'Hammer', impostor: 'Wrench', clue: 'Tool' },
+      { civilian: 'Fork', impostor: 'Spoon', clue: 'Utensil' },
+      { civilian: 'Train', impostor: 'Bus', clue: 'Transport' },
+      { civilian: 'Helmet', impostor: 'Armor', clue: 'Protection' },
+      { civilian: 'Castle', impostor: 'Palace', clue: 'Royal Building' },
+      { civilian: 'Snake', impostor: 'Lizard', clue: 'Reptile' },
+      { civilian: 'Whale', impostor: 'Shark', clue: 'Ocean' },
+      { civilian: 'Forest', impostor: 'Jungle', clue: 'Trees' },
+      { civilian: 'Blanket', impostor: 'Pillow', clue: 'Bed' },
+      { civilian: 'Cupcake', impostor: 'Donut', clue: 'Pastry' },
+      { civilian: 'Rocket', impostor: 'Satellite', clue: 'Space' },
+      { civilian: 'Sword', impostor: 'Spear', clue: 'Weapon' },
+      { civilian: 'Ring', impostor: 'Necklace', clue: 'Jewelry' },
+      { civilian: 'Mirror', impostor: 'Window', clue: 'Glass' },
+      { civilian: 'Panda', impostor: 'Koala', clue: 'Cute Animal' },
+      { civilian: 'Robot', impostor: 'Android', clue: 'Machine' },
+      { civilian: 'Violin', impostor: 'Cello', clue: 'Instrument' },
+      { civilian: 'Soccer', impostor: 'Football', clue: 'Ball Game' },
+      { civilian: 'Dragon', impostor: 'Phoenix', clue: 'Mythical' },
+      { civilian: 'Tornado', impostor: 'Hurricane', clue: 'Disaster' },
+      { civilian: 'Wallet', impostor: 'Purse', clue: 'Money' },
+      { civilian: 'Shampoo', impostor: 'Soap', clue: 'Cleaning' },
+      { civilian: 'Fries', impostor: 'Chips', clue: 'Potato' },
+      { civilian: 'Parrot', impostor: 'Crow', clue: 'Bird' },
+      { civilian: 'Camera', impostor: 'Drone', clue: 'Photography' },
+      { civilian: 'Jacket', impostor: 'Hoodie', clue: 'Clothing' },
+      { civilian: 'Volcano', impostor: 'Mountain', clue: 'Landform' },
+      { civilian: 'Cake', impostor: 'Pie', clue: 'Dessert' },
+      { civilian: 'Map', impostor: 'Compass', clue: 'Navigation' },
+      { civilian: 'Detective', impostor: 'Spy', clue: 'Investigation' },
+      { civilian: 'Fire', impostor: 'Lava', clue: 'Hot' },
+      { civilian: 'Airplane', impostor: 'Helicopter', clue: 'Flying' },
+      { civilian: 'Bicycle', impostor: 'Scooter', clue: 'Ride' },
+      { civilian: 'Cereal', impostor: 'Oatmeal', clue: 'Breakfast' },
+      { civilian: 'Zombie', impostor: 'Vampire', clue: 'Monster' },
+      { civilian: 'Printer', impostor: 'Scanner', clue: 'Office' },
+      { civilian: 'Charger', impostor: 'Battery', clue: 'Power' },
+      { civilian: 'Tent', impostor: 'Cabin', clue: 'Camping' },
+      { civilian: 'Socks', impostor: 'Gloves', clue: 'Wearable' },
+      { civilian: 'Iceberg', impostor: 'Glacier', clue: 'Ice' },
+      { civilian: 'Burger', impostor: 'Taco', clue: 'Fast Food' },
+      { civilian: 'Cookie', impostor: 'Biscuit', clue: 'Snack' },
+      { civilian: 'Dolphin', impostor: 'Seal', clue: 'Sea Animal' },
+      { civilian: 'Penguin', impostor: 'Duck', clue: 'Bird' },
+      { civilian: 'Rainbow', impostor: 'Aurora', clue: 'Sky' },
+      { civilian: 'Chess', impostor: 'Checkers', clue: 'Board Game' },
+      { civilian: 'Wifi', impostor: 'Bluetooth', clue: 'Connection' },
+      { civilian: 'Chef', impostor: 'Baker', clue: 'Kitchen' },
+      { civilian: 'Painter', impostor: 'Sculptor', clue: 'Art' },
+      { civilian: 'Submarine', impostor: 'Boat', clue: 'Water Vehicle' },
+      { civilian: 'Torch', impostor: 'Lantern', clue: 'Light Source' },
+      { civilian: 'Diamond', impostor: 'Gold', clue: 'Luxury' },
+      { civilian: 'Alien', impostor: 'Robot', clue: 'Sci-Fi' },
+      { civilian: 'Backpack', impostor: 'Suitcase', clue: 'Travel' },
+      { civilian: 'Spider', impostor: 'Scorpion', clue: 'Creepy' },
+      { civilian: 'Toothbrush', impostor: 'Toothpaste', clue: 'Dental' },
+      { civilian: 'Mushroom', impostor: 'Broccoli', clue: 'Vegetable' },
+      { civilian: 'Cup', impostor: 'Mug', clue: 'Drinkware' },
+      { civilian: 'Netflix', impostor: 'YouTube', clue: 'Streaming' },
+      { civilian: 'Police', impostor: 'Security Guard', clue: 'Protection' },
+      { civilian: 'Bat', impostor: 'Owl', clue: 'Night Animal' },
+      { civilian: 'Magic', impostor: 'Illusion', clue: 'Trick' },
+      { civilian: 'Bridge', impostor: 'Tunnel', clue: 'Road' },
+      { civilian: 'Farm', impostor: 'Garden', clue: 'Plants' },
+      { civilian: 'Pearl', impostor: 'Ruby', clue: 'Gem' },
+      { civilian: 'Microwave', impostor: 'Oven', clue: 'Cooking' },
+      { civilian: 'Sushi', impostor: 'Ramen', clue: 'Japanese Food' },
+      { civilian: 'Trophy', impostor: 'Medal', clue: 'Award' },
+      { civilian: 'Cloud', impostor: 'Fog', clue: 'Weather' },
+      { civilian: 'Safari', impostor: 'Zoo', clue: 'Animals' },
+      { civilian: 'Surfboard', impostor: 'Skateboard', clue: 'Board' },
+      { civilian: 'Ninja', impostor: 'Samurai', clue: 'Japan' },
+      { civilian: 'Pirate', impostor: 'Captain', clue: 'Sea' },
+      { civilian: 'Galaxy', impostor: 'Universe', clue: 'Space' },
+      { civilian: 'Burger', impostor: 'Sandwich', clue: 'Food' },
+      { civilian: 'Cactus', impostor: 'Palm Tree', clue: 'Desert' },
+      { civilian: 'Notebook', impostor: 'Diary', clue: 'Writing' },
+      { civilian: 'Slime', impostor: 'Mud', clue: 'Messy' },
+      { civilian: 'Ketchup', impostor: 'Mustard', clue: 'Condiment' },
+      { civilian: 'Tiger', impostor: 'Leopard', clue: 'Big Cat' },
+      { civilian: 'Wizard', impostor: 'Witch', clue: 'Magic' },
+      { civilian: 'Arcade', impostor: 'Casino', clue: 'Games' },
+      { civilian: 'Treasure', impostor: 'Gold', clue: 'Valuable' },
+      { civilian: 'Meteor', impostor: 'Comet', clue: 'Space Object' },
+      { civilian: 'Castle', impostor: 'Fortress', clue: 'Defense' },
+      { civilian: 'Pumpkin', impostor: 'Watermelon', clue: 'Big Fruit' },
+      { civilian: 'Helmet', impostor: 'Shield', clue: 'Defense' },
+      { civilian: 'Drums', impostor: 'Trumpet', clue: 'Music' },
+      { civilian: 'Lemon', impostor: 'Lime', clue: 'Sour Fruit' },
+      { civilian: 'Bread', impostor: 'Toast', clue: 'Bakery' },
+      { civilian: 'Volleyball', impostor: 'Tennis', clue: 'Sport' },
+      { civilian: 'Camping', impostor: 'Hiking', clue: 'Outdoor' },
+      { civilian: 'Refrigerator', impostor: 'Freezer', clue: 'Kitchen' }
     ];
 
     let players = [];
@@ -523,7 +629,14 @@
       }
 
       timerSeconds = Number(document.getElementById('timerSelect').value);
-      selectedPair = wordPairs[Math.floor(Math.random() * wordPairs.length)];
+      let randomIndex;
+
+      do {
+        randomIndex = Math.floor(Math.random() * wordPairs.length);
+      } while (randomIndex === lastPairIndex && wordPairs.length > 1);
+
+      lastPairIndex = randomIndex;
+      selectedPair = wordPairs[randomIndex];
       civilianWord = selectedPair.civilian;
       impostorWord = selectedPair.impostor;
       impostorClue = selectedPair.clue;
