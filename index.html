@@ -403,8 +403,14 @@
     </section>
 
     <section id="vote" class="screen">
-      <h2>Vote Out</h2>
-      <p class="muted">Choose the player you think is the impostor.</p>
+      <h2>Secret Voting</h2>
+      <p id="voteInstruction" class="muted">Pass the phone to the current voter.</p>
+
+      <div class="word-card">
+        <span class="badge" id="currentVoterBadge">Voter</span>
+        <p>Select who you think is the impostor.</p>
+      </div>
+
       <div id="voteButtons" class="vote-grid"></div>
     </section>
 
@@ -570,6 +576,12 @@
     let timeLeft = 300;
     let timerInterval = null;
     let votedPlayer = '';
+      currentVoterIndex = 0;
+      voteCounts = {};
+      voterSelections = {};
+    let currentVoterIndex = 0;
+    let voteCounts = {};
+    let voterSelections = {};
     let finalOutcome = '';
     let finalMessage = '';
 
@@ -742,34 +754,80 @@
 
     function goToVote() {
       clearTimer();
-      renderVoteButtons();
+      currentVoterIndex = 0;
+      voteCounts = {};
+      voterSelections = {};
+      prepareVotingScreen();
       goTo('vote');
     }
 
-    function renderVoteButtons() {
+    function prepareVotingScreen() {
+      const currentVoter = players[currentVoterIndex];
+
+      document.getElementById('voteInstruction').textContent =
+        `${currentVoter}, cast your vote secretly.`;
+
+      document.getElementById('currentVoterBadge').textContent = currentVoter;
+
+      renderVoteButtons(currentVoter);
+    }
+
+    function renderVoteButtons(currentVoter) {
       const voteButtons = document.getElementById('voteButtons');
       voteButtons.innerHTML = '';
 
       players.forEach(player => {
+        if (player === currentVoter) return;
+
         const button = document.createElement('button');
         button.textContent = player;
-        button.onclick = () => votePlayer(player);
+        button.onclick = () => votePlayer(currentVoter, player);
         voteButtons.appendChild(button);
       });
     }
 
-    function votePlayer(player) {
-      votedPlayer = player;
+    function votePlayer(voter, target) {
+      voterSelections[voter] = target;
+
+      if (!voteCounts[target]) {
+        voteCounts[target] = 0;
+      }
+
+      voteCounts[target]++;
+      currentVoterIndex++;
+
+      if (currentVoterIndex < players.length) {
+        prepareVotingScreen();
+        return;
+      }
+
+      determineVoteResult();
+    }
+
+    function determineVoteResult() {
+      let highestVotes = 0;
+      let topPlayers = [];
+
+      for (const player in voteCounts) {
+        if (voteCounts[player] > highestVotes) {
+          highestVotes = voteCounts[player];
+          topPlayers = [player];
+        } else if (voteCounts[player] === highestVotes) {
+          topPlayers.push(player);
+        }
+      }
+
+      votedPlayer = topPlayers[Math.floor(Math.random() * topPlayers.length)];
 
       if (votedPlayer !== impostorName) {
         finalOutcome = 'impostor';
-        finalMessage = `The group voted out ${votedPlayer}, but the real impostor was ${impostorName}.`;
+        finalMessage = `${votedPlayer} received the most votes, but the real impostor was ${impostorName}.`;
         showResults();
         goTo('results');
         return;
       }
 
-      document.getElementById('guessPrompt').textContent = `${impostorName} was found. They must now guess the civilian word.`;
+      document.getElementById('guessPrompt').textContent = `${impostorName} was voted out. They now have one final guess.`;
       document.getElementById('guessInput').value = '';
       goTo('impostorGuess');
     }
