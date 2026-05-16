@@ -399,16 +399,19 @@
         <div id="timerDisplay" class="timer">05:00</div>
       </div>
       <p>Give clues, ask questions, and look for suspicious answers. You may wait for the timer or vote early.</p>
-      <button class="danger" onclick="goToVote()">Vote Early</button>
+      <button class="danger" onclick="goToVote('Vote Early was pressed. Everyone must now vote.')">Vote Early</button>
     </section>
 
     <section id="vote" class="screen">
       <h2>Secret Voting</h2>
       <p id="voteInstruction" class="muted">Pass the phone to the current voter.</p>
+      <p id="voteReasonText" class="small-text"></p>
 
       <div class="word-card">
         <span class="badge" id="currentVoterBadge">Voter</span>
+        <p id="voterProgressText">Vote 1 of 1</p>
         <p>Select who you think is the impostor.</p>
+        <p class="small-text">Do not let other players see your vote.</p>
       </div>
 
       <div id="voteButtons" class="vote-grid"></div>
@@ -579,9 +582,11 @@
       currentVoterIndex = 0;
       voteCounts = {};
       voterSelections = {};
+      voteStartReason = '';
     let currentVoterIndex = 0;
     let voteCounts = {};
     let voterSelections = {};
+    let voteStartReason = '';
     let finalOutcome = '';
     let finalMessage = '';
 
@@ -733,7 +738,7 @@
 
         if (timeLeft <= 0) {
           clearTimer();
-          goToVote();
+          goToVote('Time is up. Everyone must now vote.');
         }
       }, 1000);
     }
@@ -752,8 +757,9 @@
         `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
 
-    function goToVote() {
+    function goToVote(reason = 'Voting has started.') {
       clearTimer();
+      voteStartReason = reason;
       currentVoterIndex = 0;
       voteCounts = {};
       voterSelections = {};
@@ -765,9 +771,12 @@
       const currentVoter = players[currentVoterIndex];
 
       document.getElementById('voteInstruction').textContent =
-        `${currentVoter}, cast your vote secretly.`;
+        `Pass the phone to ${currentVoter}.`;
 
-      document.getElementById('currentVoterBadge').textContent = currentVoter;
+      document.getElementById('voteReasonText').textContent = voteStartReason;
+      document.getElementById('currentVoterBadge').textContent = `${currentVoter} is voting`;
+      document.getElementById('voterProgressText').textContent =
+        `Vote ${currentVoterIndex + 1} of ${players.length}`;
 
       renderVoteButtons(currentVoter);
     }
@@ -821,13 +830,13 @@
 
       if (votedPlayer !== impostorName) {
         finalOutcome = 'impostor';
-        finalMessage = `${votedPlayer} received the most votes, but the real impostor was ${impostorName}.`;
+        finalMessage = `${votedPlayer} was suspected because they received the most votes, but the real impostor was ${impostorName}.`;
         showResults();
         goTo('results');
         return;
       }
 
-      document.getElementById('guessPrompt').textContent = `${impostorName} was voted out. They now have one final guess.`;
+      document.getElementById('guessPrompt').textContent = `${impostorName} received the most votes and was suspected as the impostor. They now have one final guess.`;
       document.getElementById('guessInput').value = '';
       goTo('impostorGuess');
     }
