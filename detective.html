@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detective</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(rgba(10, 10, 30, 0.88), rgba(10, 10, 30, 0.88)),
+        repeating-linear-gradient(
+          0deg,
+          #070716 0px,
+          #070716 3px,
+          #10102a 3px,
+          #10102a 6px
+        );
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 14px;
+      font-family: 'VT323', monospace;
+      image-rendering: pixelated;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 460px;
+      background: #111827;
+      border: 4px solid #facc15;
+      border-radius: 0;
+      padding: 20px;
+      box-shadow:
+        0 0 0 4px #111827,
+        0 0 0 8px #ec4899,
+        12px 12px 0 #000,
+        0 0 30px rgba(236, 72, 153, 0.55);
+      position: relative;
+    }
+
+    .app::before {
+      content: 'READY PLAYER?';
+      position: absolute;
+      top: -16px;
+      left: 14px;
+      background: #111827;
+      color: #22c55e;
+      padding: 0 8px;
+      font-family: 'Press Start 2P', system-ui;
+      font-size: 9px;
+      text-shadow: 2px 2px #000;
+    }
+
+    h1, h2, h3 {
+      text-align: center;
+      margin-top: 0;
+      font-family: 'Press Start 2P', system-ui;
+      text-transform: uppercase;
+      line-height: 1.35;
+      text-shadow: 3px 3px #000;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #facc15;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 18px;
+      color: #67e8f9;
+    }
+
+    h3 {
+      font-size: 13px;
+      color: #f9a8d4;
+    }
+
+    p, label {
+      line-height: 1.35;
+      color: #e5e7eb;
+      font-size: 22px;
+    }
+
+    strong {
+      color: #facc15;
+    }
+
+    .muted {
+      color: #a7f3d0;
+      font-size: 19px;
+      text-align: center;
+    }
+
+    input, select, button {
+      width: 100%;
+      border: 3px solid #f8fafc;
+      border-radius: 0;
+      padding: 14px;
+      font-size: 21px;
+      margin: 8px 0;
+      font-family: 'VT323', monospace;
+      box-shadow: 5px 5px 0 #000;
+    }
+
+    input, select {
+      background: #e5e7eb;
+      color: #111827;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #facc15;
+      box-shadow: 5px 5px 0 #000, 0 0 14px #facc15;
+    }
+
+    button {
+      background: #7c3aed;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button:active {
+      transform: translate(4px, 4px);
+      box-shadow: 1px 1px 0 #000;
+    }
+
+    button.secondary {
+      background: #2563eb;
+    }
+
+    button.danger {
+      background: #dc2626;
+    }
+
+    button.success {
+      background: #16a34a;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+      animation: arcadeIn 0.18s steps(2, end);
+    }
+
+    @keyframes arcadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .player-list {
+      margin: 14px 0;
+    }
+
+    .player-chip {
+      background: #0f172a;
+      border: 3px solid #38bdf8;
+      padding: 10px 12px;
+      margin: 8px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 5px 5px 0 #000;
+      color: #f8fafc;
+      font-size: 22px;
+    }
+
+    .player-chip span {
+      overflow-wrap: anywhere;
+    }
+
+    .remove-btn {
+      width: auto;
+      padding: 7px 10px;
+      margin: 0;
+      font-size: 16px;
+      box-shadow: 3px 3px 0 #000;
+    }
+
+    .word-card, .result-card, .timer-card {
+      background: #020617;
+      border: 4px solid #22c55e;
+      padding: 22px 16px;
+      text-align: center;
+      margin: 18px 0;
+      box-shadow: 7px 7px 0 #000;
+    }
+
+    .word-card {
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 11px;
+      background: #be185d;
+      border: 2px solid #f8fafc;
+      color: white;
+      font-size: 17px;
+      margin-bottom: 10px;
+      box-shadow: 3px 3px 0 #000;
+      text-transform: uppercase;
+    }
+
+    .word {
+      font-size: 43px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin: 10px 0;
+      overflow-wrap: anywhere;
+      color: #facc15;
+      text-shadow: 4px 4px #000;
+    }
+
+    .hidden-word {
+      font-size: 25px;
+      color: #d1d5db;
+    }
+
+    .clue {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 3px dashed #facc15;
+      color: #fde68a;
+      font-size: 21px;
+    }
+
+    .timer {
+      font-family: 'Press Start 2P', system-ui;
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      margin: 18px 0;
+      color: #22c55e;
+      text-shadow: 4px 4px #000;
+    }
+
+    .vote-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .guess-input {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .final-title {
+      font-family: 'Press Start 2P', system-ui;
+      font-size: 20px;
+      line-height: 1.4;
+      font-weight: 900;
+      text-align: center;
+      margin: 16px 0;
+      text-shadow: 4px 4px #000;
+    }
+
+    .winner-civilians {
+      color: #22c55e;
+    }
+
+    .winner-impostor {
+      color: #f87171;
+    }
+
+    .winner-draw {
+      color: #facc15;
+    }
+
+    .small-text {
+      font-size: 17px;
+      color: #cbd5e1;
+      text-align: center;
+    }
+
+    @media (max-width: 380px) {
+      .app {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      h2 {
+        font-size: 15px;
+      }
+
+      .word {
+        font-size: 34px;
+      }
+
+      .timer {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section id="home" class="screen active">
+      <h1>Detective</h1>
+      <p class="muted">A mobile pass-and-play word bluffing game.</p>
+      <p>Players secretly receive words. One player is the impostor. The group gives clues, discusses, and votes who to eliminate.</p>
+      <button onclick="goTo('players')">Start Game</button>
+      <button class="secondary" onclick="goTo('rules')">How to Play</button>
+    </section>
+
+    <section id="rules" class="screen">
+      <h2>How to Play</h2>
+      <p><strong>Civilians</strong> all receive the same word.</p>
+      <p><strong>The impostor</strong> receives a different but related word.</p>
+      <p>If there are <strong>5 or fewer players</strong>, the impostor also receives a small clue about the civilian word.</p>
+      <p>If there are <strong>6 or more players</strong>, the impostor receives no clue.</p>
+      <p>After the timer starts, players give clues and discuss. When time ends, or when players vote early, the group chooses who they think is the impostor.</p>
+      <button onclick="goTo('home')">Back</button>
+    </section>
+
+    <section id="players" class="screen">
+      <h2>Game Setup</h2>
+      <input id="playerName" placeholder="Enter player name" autocomplete="off" />
+      <button onclick="addPlayer()">Add Player</button>
+
+      <div id="playerList" class="player-list"></div>
+
+      <label for="timerSelect">Round Timer</label>
+      <select id="timerSelect">
+        <option value="300">5 minutes</option>
+        <option value="600">10 minutes</option>
+        <option value="900">15 minutes</option>
+      </select>
+
+      <button onclick="startGame()">Start Round</button>
+      <button class="secondary" onclick="goTo('home')">Back</button>
+      <p class="small-text">Minimum players: 3. This version uses exactly 1 impostor per round.</p>
+    </section>
+
+    <section id="reveal" class="screen">
+      <h2 id="revealTitle">Pass the Phone</h2>
+      <p class="muted">Only the current player should look.</p>
+
+      <div class="word-card">
+        <span class="badge" id="currentPlayerBadge">Player</span>
+        <div id="wordDisplay" class="hidden-word">Tap reveal to see your word</div>
+        <div id="clueDisplay" class="clue" style="display:none;"></div>
+      </div>
+
+      <button id="revealButton" onclick="revealWord()">Reveal Word</button>
+      <button id="nextButton" onclick="nextPlayer()" style="display:none;">Hide & Pass</button>
+    </section>
+
+    <section id="discussion" class="screen">
+      <h2>Clue Round</h2>
+      <div class="timer-card">
+        <p class="muted">Time remaining</p>
+        <div id="timerDisplay" class="timer">05:00</div>
+      </div>
+      <p>Give clues, ask questions, and look for suspicious answers. You may wait for the timer or vote early.</p>
+      <button class="danger" onclick="goToVote()">Vote Early</button>
+    </section>
+
+    <section id="vote" class="screen">
+      <h2>Vote Out</h2>
+      <p class="muted">Choose the player you think is the impostor.</p>
+      <div id="voteButtons" class="vote-grid"></div>
+    </section>
+
+    <section id="impostorGuess" class="screen">
+      <h2>Final Chance</h2>
+      <p id="guessPrompt" class="muted">The impostor was found. Guess the civilian word.</p>
+      <input id="guessInput" class="guess-input" placeholder="Type the civilian word" autocomplete="off" />
+      <button onclick="submitGuess()">Submit Guess</button>
+    </section>
+
+    <section id="results" class="screen">
+      <h2>Results</h2>
+      <div id="finalResult"></div>
+      <button onclick="playAgainSamePlayers()">Play Again</button>
+      <button class="secondary" onclick="backToSetup()">Change Setup</button>
+    </section>
+  </main>
+
+  <script>
+    const wordPairs = [
+      { civilian: 'Pizza', impostor: 'Burger', clue: 'Food' },
+      { civilian: 'Beach', impostor: 'Pool', clue: 'Water' },
+      { civilian: 'Cat', impostor: 'Dog', clue: 'Pet' },
+      { civilian: 'Teacher', impostor: 'Professor', clue: 'School' },
+      { civilian: 'Coffee', impostor: 'Tea', clue: 'Drink' },
+      { civilian: 'Moon', impostor: 'Sun', clue: 'Sky' },
+      { civilian: 'Basketball', impostor: 'Volleyball', clue: 'Sport' },
+      { civilian: 'School', impostor: 'Library', clue: 'Study' },
+      { civilian: 'Rain', impostor: 'Storm', clue: 'Weather' },
+      { civilian: 'Movie', impostor: 'Series', clue: 'Watch' },
+      { civilian: 'Car', impostor: 'Motorcycle', clue: 'Vehicle' },
+      { civilian: 'Phone', impostor: 'Tablet', clue: 'Gadget' },
+      { civilian: 'Chocolate', impostor: 'Candy', clue: 'Sweet' },
+      { civilian: 'Airport', impostor: 'Train Station', clue: 'Travel' },
+      { civilian: 'Doctor', impostor: 'Nurse', clue: 'Hospital' },
+      { civilian: 'Mountain', impostor: 'Hill', clue: 'Nature' },
+      { civilian: 'Laptop', impostor: 'Computer', clue: 'Technology' },
+      { civilian: 'Guitar', impostor: 'Piano', clue: 'Music' },
+      { civilian: 'Chicken', impostor: 'Fish', clue: 'Food' },
+      { civilian: 'Christmas', impostor: 'Birthday', clue: 'Celebration' },
+      { civilian: 'Shoes', impostor: 'Slippers', clue: 'Footwear' },
+      { civilian: 'Ocean', impostor: 'River', clue: 'Water' },
+      { civilian: 'King', impostor: 'Queen', clue: 'Royalty' },
+      { civilian: 'Pen', impostor: 'Pencil', clue: 'Writing' },
+      { civilian: 'Ice Cream', impostor: 'Cake', clue: 'Dessert' }
+    ];
+
+    let players = [];
+    let assignments = [];
+    let currentRevealIndex = 0;
+    let selectedPair = null;
+    let civilianWord = '';
+    let impostorWord = '';
+    let impostorName = '';
+    let impostorClue = '';
+    let timerSeconds = 300;
+    let timeLeft = 300;
+    let timerInterval = null;
+    let votedPlayer = '';
+    let finalOutcome = '';
+    let finalMessage = '';
+
+    function goTo(screenId) {
+      document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function addPlayer() {
+      const input = document.getElementById('playerName');
+      const name = input.value.trim();
+
+      if (!name) {
+        alert('Please enter a player name.');
+        return;
+      }
+
+      if (players.some(player => player.toLowerCase() === name.toLowerCase())) {
+        alert('That player is already added.');
+        return;
+      }
+
+      players.push(name);
+      input.value = '';
+      renderPlayers();
+    }
+
+    function removePlayer(index) {
+      players.splice(index, 1);
+      renderPlayers();
+    }
+
+    function renderPlayers() {
+      const list = document.getElementById('playerList');
+      list.innerHTML = '';
+
+      if (players.length === 0) {
+        list.innerHTML = '<p class="muted">No players added yet.</p>';
+        return;
+      }
+
+      players.forEach((player, index) => {
+        const chip = document.createElement('div');
+        chip.className = 'player-chip';
+        chip.innerHTML = `
+          <span>${escapeHTML(player)}</span>
+          <button class="danger remove-btn" onclick="removePlayer(${index})">Remove</button>
+        `;
+        list.appendChild(chip);
+      });
+    }
+
+    function startGame() {
+      if (players.length < 3) {
+        alert('You need at least 3 players.');
+        return;
+      }
+
+      timerSeconds = Number(document.getElementById('timerSelect').value);
+      selectedPair = wordPairs[Math.floor(Math.random() * wordPairs.length)];
+      civilianWord = selectedPair.civilian;
+      impostorWord = selectedPair.impostor;
+      impostorClue = selectedPair.clue;
+      impostorName = players[Math.floor(Math.random() * players.length)];
+
+      assignments = players.map(player => ({
+        name: player,
+        role: player === impostorName ? 'Impostor' : 'Civilian',
+        word: player === impostorName ? impostorWord : civilianWord
+      }));
+
+      currentRevealIndex = 0;
+      votedPlayer = '';
+      finalOutcome = '';
+      finalMessage = '';
+      clearTimer();
+      prepareRevealScreen();
+      goTo('reveal');
+    }
+
+    function prepareRevealScreen() {
+      const current = assignments[currentRevealIndex];
+      document.getElementById('revealTitle').textContent = `Pass to ${current.name}`;
+      document.getElementById('currentPlayerBadge').textContent = current.name;
+      document.getElementById('wordDisplay').textContent = 'Tap reveal to see your word';
+      document.getElementById('wordDisplay').className = 'hidden-word';
+      document.getElementById('clueDisplay').style.display = 'none';
+      document.getElementById('clueDisplay').textContent = '';
+      document.getElementById('revealButton').style.display = 'block';
+      document.getElementById('nextButton').style.display = 'none';
+    }
+
+    function revealWord() {
+      const current = assignments[currentRevealIndex];
+      const wordDisplay = document.getElementById('wordDisplay');
+      const clueDisplay = document.getElementById('clueDisplay');
+
+      wordDisplay.textContent = current.word;
+      wordDisplay.className = 'word';
+
+      if (current.role === 'Impostor' && players.length <= 5) {
+        clueDisplay.textContent = `Clue about the real word: ${impostorClue}`;
+        clueDisplay.style.display = 'block';
+      }
+
+      document.getElementById('revealButton').style.display = 'none';
+      document.getElementById('nextButton').style.display = 'block';
+    }
+
+    function nextPlayer() {
+      currentRevealIndex++;
+
+      if (currentRevealIndex >= assignments.length) {
+        startTimer();
+        goTo('discussion');
+        return;
+      }
+
+      prepareRevealScreen();
+    }
+
+    function startTimer() {
+      clearTimer();
+      timeLeft = timerSeconds;
+      updateTimerDisplay();
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+
+        if (timeLeft <= 0) {
+          clearTimer();
+          goToVote();
+        }
+      }, 1000);
+    }
+
+    function clearTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      document.getElementById('timerDisplay').textContent =
+        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function goToVote() {
+      clearTimer();
+      renderVoteButtons();
+      goTo('vote');
+    }
+
+    function renderVoteButtons() {
+      const voteButtons = document.getElementById('voteButtons');
+      voteButtons.innerHTML = '';
+
+      players.forEach(player => {
+        const button = document.createElement('button');
+        button.textContent = player;
+        button.onclick = () => votePlayer(player);
+        voteButtons.appendChild(button);
+      });
+    }
+
+    function votePlayer(player) {
+      votedPlayer = player;
+
+      if (votedPlayer !== impostorName) {
+        finalOutcome = 'impostor';
+        finalMessage = `The group voted out ${votedPlayer}, but the real impostor was ${impostorName}.`;
+        showResults();
+        goTo('results');
+        return;
+      }
+
+      document.getElementById('guessPrompt').textContent = `${impostorName} was found. They must now guess the civilian word.`;
+      document.getElementById('guessInput').value = '';
+      goTo('impostorGuess');
+    }
+
+    function submitGuess() {
+      const guess = document.getElementById('guessInput').value.trim();
+
+      if (!guess) {
+        alert('Please type a guess.');
+        return;
+      }
+
+      if (normalizeText(guess) === normalizeText(civilianWord)) {
+        finalOutcome = 'draw';
+        finalMessage = `${impostorName} guessed the civilian word correctly.`;
+      } else {
+        finalOutcome = 'civilians';
+        finalMessage = `${impostorName} guessed "${guess}", but the civilian word was "${civilianWord}".`;
+      }
+
+      showResults();
+      goTo('results');
+    }
+
+    function showResults() {
+      const finalResult = document.getElementById('finalResult');
+      let title = '';
+      let className = '';
+
+      if (finalOutcome === 'impostor') {
+        title = 'Impostor Wins';
+        className = 'winner-impostor';
+      } else if (finalOutcome === 'civilians') {
+        title = 'Civilians Win';
+        className = 'winner-civilians';
+      } else if (finalOutcome === 'draw') {
+        title = 'Draw';
+        className = 'winner-draw';
+      }
+
+      finalResult.innerHTML = `
+        <div class="final-title ${className}">${title}</div>
+        <div class="result-card">
+          <h3>What Happened</h3>
+          <p>${escapeHTML(finalMessage)}</p>
+        </div>
+        <div class="result-card">
+          <h3>Civilian Word</h3>
+          <p class="word">${escapeHTML(civilianWord)}</p>
+        </div>
+        <div class="result-card">
+          <h3>Impostor Word</h3>
+          <p class="word">${escapeHTML(impostorWord)}</p>
+        </div>
+        <div class="result-card">
+          <h3>Impostor</h3>
+          <p>${escapeHTML(impostorName)}</p>
+        </div>
+      `;
+    }
+
+    function playAgainSamePlayers() {
+      startGame();
+    }
+
+    function backToSetup() {
+      clearTimer();
+      renderPlayers();
+      goTo('players');
+    }
+
+    function normalizeText(text) {
+      return text.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function escapeHTML(text) {
+      return String(text)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    document.getElementById('playerName').addEventListener('keydown', event => {
+      if (event.key === 'Enter') addPlayer();
+    });
+
+    document.getElementById('guessInput').addEventListener('keydown', event => {
+      if (event.key === 'Enter') submitGuess();
+    });
+
+    renderPlayers();
+  </script>
+</body>
+</html>
