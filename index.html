@@ -567,28 +567,28 @@
       { civilian: 'Refrigerator', impostor: 'Freezer', clue: 'Kitchen' }
     ];
 
-    let players = [];
-    let assignments = [];
-    let currentRevealIndex = 0;
-    let selectedPair = null;
-    let civilianWord = '';
-    let impostorWord = '';
-    let impostorName = '';
-    let impostorClue = '';
-    let timerSeconds = 300;
-    let timeLeft = 300;
-    let timerInterval = null;
-    let votedPlayer = '';
+    var players = [];
+    var assignments = [];
+    var currentRevealIndex = 0;
+    var selectedPair = null;
+    var civilianWord = '';
+    var impostorWord = '';
+    var impostorName = '';
+    var impostorClue = '';
+    var timerSeconds = 300;
+    var timeLeft = 300;
+    var timerInterval = null;
+    var votedPlayer = '';
       currentVoterIndex = 0;
       voteCounts = {};
       voterSelections = {};
       voteStartReason = '';
-    let currentVoterIndex = 0;
-    let voteCounts = {};
-    let voterSelections = {};
-    let voteStartReason = '';
-    let finalOutcome = '';
-    let finalMessage = '';
+    var currentVoterIndex = 0;
+    var voteCounts = {};
+    var voterSelections = {};
+    var voteStartReason = '';
+    var finalOutcome = '';
+    var finalMessage = '';
 
     function goTo(screenId) {
       document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
